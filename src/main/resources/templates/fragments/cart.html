@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div  th:fragment="cart" class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+    <div class="offcanvas-header">
+        <h5 id="offcanvasRightLabel">Cart</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div th:each="item : ${cart}" class="offcanvas-body">
+        <span th:text="${item.key.name}"></span>
+        <span th:text="${item.key.cost}"></span>
+        <span th:text="${item.value}"></span>
+    </div>
+</div>
+
+</body>
+</html>

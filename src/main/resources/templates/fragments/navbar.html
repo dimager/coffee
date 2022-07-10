@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>navbar</title>
+</head>
+<body>
+<nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="#!">Coffee shop</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="#!">Home</a></li>
+                <li sec:authorize="isAnonymous()" class="nav-item"><a class="nav-link active" aria-current="page"
+                                                                      href="/login">Login</a></li>
+                <li sec:authorize="!isAnonymous()" class="nav-item"><a class="nav-link active" aria-current="page"
+                                                                       href="/login">Login1</a></li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link active" aria-current="page"
+                                                                           href="/login">Login2</a></li>
+                <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link active" aria-current="page"
+                                                                          href="/login">Login3</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <!-- <li class="nav-item dropdown">
+                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                         <li><a class="dropdown-item" href="#!">All Products</a></li>
+                         <li><hr class="dropdown-divider" /></li>
+                         <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                         <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                     </ul>
+                 </li>-->
+                <div sec:authorize="isAuthenticated()">
+                    <a href="/userinfo">userinfo</a>
+                </div>
+            </ul>
+
+            <button class="btn btn-outline-dark me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <i class="bi-cart-fill me-1"></i>
+                Cart
+                <span class="badge bg-dark text-white ms-1 rounded-pill" th:text="${cartCount}">0</span>
+            </button>
+
+
+            <form sec:authorize="isAuthenticated()" class="d-flex me-2" th:action="@{/logout}" method="post">
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cart-fill me-1"></i>
+                    Logout
+                </button>
+            </form>
+            <!-- Button trigger modal -->
+            <button sec:authorize="!isAuthenticated()" type="button" class="btn btn-outline-dark me-2"
+                    data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Login
+            </button>
+
+            <!-- Modal -->
+            <div sec:authorize="!isAuthenticated()" class="modal fade" id="exampleModal" tabindex="-1"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{/login.html}" method="post">
+                            <div class="modal-body">
+                                <label for="username" class="form-label">Username</label>:
+                                <input class="form-control" type="text" id="username" name="username" autofocus="autofocus"/> <br/>
+                                <label for="password" class="form-label">Password</label>:
+                                <input class="form-control" type="password" id="password" name="password"/> <br/>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-dark me-2" data-bs-dismiss="modal">Close</button>
+                                <input type="submit" class="btn btn-outline-dark me-2" value="Log in"/>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
