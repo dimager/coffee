@@ -20,8 +20,8 @@ public class OrderServiceImpl implements OrderService {
     UserRepository userRepository;
     @Autowired
     OrdersRepository ordersRepository;
-
-    public void makeOrder(Order order) {
+    @Override
+    public void doOrder(Order order) {
         ordersRepository.save(order);
     }
 

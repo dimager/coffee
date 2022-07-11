@@ -24,6 +24,7 @@ import java.util.TreeSet;
 })
 @Getter
 @Setter
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +47,16 @@ public class User {
     private Set<Order> orders = new TreeSet<>(Comparator.comparing(Order::getOrderDateTime));
 
     public User() {
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", discount=" + discount +
+                ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
+                '}';
     }
 
     public User(String username) {

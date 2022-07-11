@@ -12,8 +12,7 @@
             <div th:each="product : ${products}" class="col mb-5">
                 <div class="card h-100">
                     <!-- Product image-->
-                    <!--                    <img class="card-img-top"  th:src="@{'data:image/jpeg;base64,'+${product.imageBase64}}" alt="..." />-->
-                    <img class="card-img-top" th:src="@{'data:image/jpeg;base64,'+${product.imageBase64}}" alt="..."/>
+                    <img class="card-img-top" th:src="@{'data:image/jpeg;base64,'+${product.imageBase64}}" />
                     <!-- Product details-->
                     <div class="card-body p-4">
                         <div class="text-center">
@@ -29,8 +28,7 @@
                     </div>
                     <!-- Product actions-->
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <form class="d-flex me-2" th:object="${aaa}" th:action="@{/addtocart}"
-                              method="post">
+                        <form class="d-flex me-2" th:object="${addProductToCart}" th:action="@{/addtocart}" method="post">
                             <input type="hidden" name="id" id="id" th:value="${product.id}"/>
                             <div class="text-center">
                                 <button class="btn btn-outline-dark" type="submit">

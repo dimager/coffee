@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Controller
 public class Main {
@@ -55,6 +56,9 @@ public class Main {
     public HashMap<Product, Integer> getCart(HttpSession httpSession, Model model, Authentication authentication, Principal principal) {
         HashMap<Product, Integer> cart = cartService.getCart(httpSession, principal, authentication);
 //        model.addAttribute("cartCount", cart.size());
+        AtomicInteger totalPrice = new AtomicInteger();
+        cart.forEach((product, integer) -> totalPrice.addAndGet(product.getCost().intValue() * integer));
+        model.addAttribute("totalPrice", totalPrice);
         model.addAttribute("cartCount", cart.values().stream().reduce(Integer::sum).orElse(0));
         return cart;
     }
@@ -83,20 +87,49 @@ public class Main {
         return "index.html";
     }
 
+    @RequestMapping("/doorder")
+    public String doOrder(HttpSession httpSession, Principal principal, Authentication authentication) {
+        cartService.doOrder(httpSession, principal, authentication);
+        return "index.html";
+    }
+
+
     @PostMapping("/addtocart")
-    public RedirectView addToCart(@ModelAttribute(value = "aaa") Product product, Authentication authentication, HttpSession httpSession, Principal principal) {
-        if (authentication != null && authentication.isAuthenticated()) {
-            cartService.addToCart(product, principal);
-        } else {
-            cartService.addToCart(product, httpSession.getId());
-        }
+    public RedirectView addToCart(@ModelAttribute(value = "addProductToCart") Product product,
+                                  Authentication authentication,
+                                  HttpSession httpSession,
+                                  Principal principal) {
+        cartService.addToCart(product, authentication, principal, httpSession);
         return new RedirectView("/");
+    }
+
+    @PostMapping("/additem")
+    public RedirectView addItem(@ModelAttribute(value = "addProductToCart") Product product,
+                                Authentication authentication,
+                                HttpSession httpSession,
+                                Principal principal) {
+        cartService.addToCart(product, authentication, principal, httpSession);
+        return new RedirectView("/cart");
+    }
+
+    @PostMapping("/deletefromcart")
+    public RedirectView deleteFromCart(@ModelAttribute(value = "deleteProductFromCart") Product product,
+                                       Authentication authentication,
+                                       HttpSession httpSession,
+                                       Principal principal) {
+        cartService.deleteFromCart(product, authentication, principal, httpSession);
+        return new RedirectView("/cart");
     }
 
 
     @RequestMapping("/admin")
     public String viewAdminPage() {
         return "admin.html";
+    }
+
+    @RequestMapping("/cart")
+    public String viewCartPage() {
+        return "cart.html";
     }
 
     @RequestMapping("/login-error")

@@ -36,13 +36,21 @@
                     <a href="/userinfo">userinfo</a>
                 </div>
             </ul>
-
-            <button class="btn btn-outline-dark me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-                <i class="bi-cart-fill me-1"></i>
-                Cart
-                <span class="badge bg-dark text-white ms-1 rounded-pill" th:text="${cartCount}">0</span>
-            </button>
-
+            <!--            offcanvas cart-->
+            <!--
+                        <button class="btn btn-outline-dark me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                            <i class="bi-cart-fill me-1"></i>
+                            Cart
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" th:text="${cartCount}">0</span>
+                        </button>
+                        -->
+            <form class="d-flex me-2" th:action="@{/cart}">
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cart-fill me-1"></i>
+                    Cart
+                    <span class="badge bg-dark text-white ms-1 rounded-pill" th:text="${cartCount}">0</span>
+                </button>
+            </form>
 
             <form sec:authorize="isAuthenticated()" class="d-flex me-2" th:action="@{/logout}" method="post">
                 <button class="btn btn-outline-dark" type="submit">
@@ -68,12 +76,14 @@
                         <form th:action="@{/login.html}" method="post">
                             <div class="modal-body">
                                 <label for="username" class="form-label">Username</label>:
-                                <input class="form-control" type="text" id="username" name="username" autofocus="autofocus"/> <br/>
+                                <input class="form-control" type="text" id="username" name="username"
+                                       autofocus="autofocus"/> <br/>
                                 <label for="password" class="form-label">Password</label>:
                                 <input class="form-control" type="password" id="password" name="password"/> <br/>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-dark me-2" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-outline-dark me-2" data-bs-dismiss="modal">Close
+                                </button>
                                 <input type="submit" class="btn btn-outline-dark me-2" value="Log in"/>
                             </div>
                         </form>

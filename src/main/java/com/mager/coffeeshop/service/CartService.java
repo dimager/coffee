@@ -8,7 +8,11 @@ import java.security.Principal;
 import java.util.HashMap;
 
 public interface CartService {
-    void addToCart(Product product, Principal principal);
-    void addToCart(Product product, String sessionId);
     HashMap<Product, Integer> getCart(HttpSession httpSession, Principal principal, Authentication authentication);
+    void addToCart(Product product, Authentication authentication, Principal principal, HttpSession httpSession);
+
+    void deleteFromCart(Product product, Authentication authentication, Principal principal, HttpSession httpSession);
+
+
+    void doOrder(HttpSession httpSession, Principal principal, Authentication authentication);
 }

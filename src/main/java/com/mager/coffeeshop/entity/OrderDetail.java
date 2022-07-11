@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_detail")
@@ -23,17 +24,36 @@ public class OrderDetail {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    public OrderDetail(String productId, Integer productCount, BigDecimal productCost) {
+        this.productId = productId;
+        this.productCount = productCount;
+        this.productCost = productCost;
+    }
+
+    @ManyToOne(optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @Column(name = "product_id", nullable = false)
-    private Long productId;
+    private String productId;
 
     @Column(name = "product_count", nullable = false)
-    private Long productCount;
+    private Integer productCount;
 
     @Column(name = "product_cost", nullable = false)
-    private Long productCost;
+    private BigDecimal productCost;
 
+    public OrderDetail() {
+
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDetail{" +
+                "id=" + id +
+                ", productId='" + productId + '\'' +
+                ", productCount=" + productCount +
+                ", productCost=" + productCost +
+                '}';
+    }
 }
