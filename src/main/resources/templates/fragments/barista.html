@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="order-is-absent">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="#{order.absent}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+<div th:fragment="order-details">
+    <div th:if="${orderIsAbsent}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="#{order.absent}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${not orderIsAbsent}" class="d-flex flex-column mb-3">
+        <div class="p-2 bd-highlight" th:text="|Orderid: ${order.id}|"></div>
+        <div class="p-2 bd-highlight" th:text="|Order date: ${order.orderDateTime}|"></div>
+        <div class="p-2 bd-highlight" th:text="|Cost: ${order.cost*(100-order.discount)/100}|"></div>
+        <div class="p-2 bd-highlight" th:text="|Status: ${order.orderStatus}|"></div>
+        <div class="p-2 bd-highlight"  th:text="|Username: ${order.orderUserinfo.name}|"></div>
+        <div class="p-2 bd-highlight"  th:text="${#phoneNumber.format(order.orderUserinfo.phone, 'BY', 'INTERNATIONAL')}"></div>
+        <div class="p-2 bd-highlight" th:text="|User discount: ${order.discount}|"></div>
+        <div class="p-2 bd-highlight d-inline-flex p-2">
+            <form class="form-inline" th:object="${orderChangeDisc}" th:action="@{/change-discount}" method="post">
+                <input type="text" name="id" th:value="${order.id}" hidden/>
+                <label th:text="|Discont: ${order.discount} %|"></label>
+                <label for="inlineFormCustomSelectPref">Change discount:</label>
+                <select class="custom-select" name="discount" id="inlineFormCustomSelectPref">
+                    <option>Choose...</option>
+                    <option selected th:value="5">5%</option>
+                    <option th:value="10">10%</option>
+                    <option th:value="15">15%</option>
+                </select>
+                <button type="submit" class="btn btn-outline-dark btn-sm">Change</button>
+            </form>
+        </div>
+        <div class="p-2 bd-highlight">
+
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Count</th>
+                </tr>
+                </thead>
+                <tbody th:each="o : ${orderDetails}">
+                <tr>
+                    <td th:text="${o.value.name}">Mark</td>
+                    <td th:text="${o.key.productCount}">Otto</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!--            <img class="card-img-top" th:src="@{'data:image/jpeg;base64,'+${o.value.imageBase64}}"/>-->
+        </div>
+        <div class="p-2 bd-highlight d-flex flex-row">
+            <form sec:authorize="hasRole('ROLE_ADMIN')" class="d-flex me-2" th:action="@{/change-status}" method="post">
+                <input type="text" name="id" th:value="${order.id}" hidden/>
+                <input name="orderStatus" th:value="${T(com.mager.coffeeshop.entity.OrderStatus).CONFIRMED}" hidden>
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cartItem-fill me-1"></i>
+                    Confirm
+                </button>
+            </form>
+            <form sec:authorize="hasRole('ROLE_ADMIN')" class="d-flex me-2" th:action="@{/change-status}" method="post">
+                <input type="text" name="id" th:value="${order.id}" hidden/>
+                <input name="orderStatus" th:value="${T(com.mager.coffeeshop.entity.OrderStatus).COMPLETED}" hidden>
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cartItem-fill me-1"></i>
+                    Complete
+                </button>
+            </form>
+
+            <form sec:authorize="hasRole('ROLE_ADMIN')" class="d-flex me-2" th:action="@{/change-status}" method="post">
+                <input type="text" name="id" th:value="${order.id}" hidden/>
+                <input name="orderStatus" th:value="${T(com.mager.coffeeshop.entity.OrderStatus).CANCELED}" hidden>
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cartItem-fill me-1"></i>
+                    Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+<div th:fragment="main-panel" class="d-flex flex-column justify-content-center">
+    <div th:if="${orderIsAbsent}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="#{order.absent}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="d-flex flex-row justify-content-center mt-3">
+        <ul class="pagination">
+            <li th:each="status : ${allOrderStatus}" class="me-3">
+                <a class="btn btn-outline-dark" th:href="@{/orders(order_status=${status})}" th:text="${status}"></a>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">user</th>
+                <th scope="col">phone</th>
+                <th scope="col">price</th>
+                <th scope="col">status</th>
+                <th scope="col">Time</th>
+                <th scope="col">details</th>
+                <th scope="col">Location</th>
+            </tr>
+            </thead>
+            <tbody th:each="order : ${orders}">
+            <tr>
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.orderUserinfo.name}"></td>
+                <td th:text="${#phoneNumber.format(order.orderUserinfo.phone, 'BY', 'INTERNATIONAL')}"></td>
+                <td th:text="${order.cost*(100-order.discount)/100}"></td>
+                <td th:text="${order.orderStatus}"></td>
+                <td th:text="${#dates.format(order.orderDateTime, 'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <a class="fa-solid fa-circle-info" th:target="_blank" th:href="@{'/order-details/'+${order.id}}"></a>
+                </td>
+                <td th:text="${order.location.name}">Mark</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:if="${orders.getTotalPages > 1}" class="d-flex flex-row justify-content-center">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li th:if="${currentPage>0 }" class="page-item">
+                    <a class="page-link"
+                       th:href="@{/orders(location_id=${locationId},order_status=${orderStatus},page=0)}">1</a></li>
+                <li th:if="${currentPage>1}" class="page-item">
+                    <a class="page-link"
+                       th:href="@{/orders(location_id=${locationId},order_status=${orderStatus},page=${currentPage-1})}">Previous</a>
+                </li>
+                <li class="page-item active">
+                    <a class="page-link"
+                       th:href="@{/orders(location_id=${locationId},order_status=${orderStatus},page=${currentPage})}"
+                       th:text="${currentPage+1}"></a></li>
+                <li th:if="${currentPage<orders.getTotalPages-1}" class="page-item">
+                    <a class="page-link"
+                       th:href="@{/orders(location_id=${locationId},order_status=${orderStatus},page=${currentPage+1})}">Next</a>
+                </li>
+                <li th:if="${currentPage<orders.getTotalPages-1}" class="page-item">
+                    <a class="page-link"
+                       th:href="@{/orders(location_id=${locationId},order_status=${orderStatus},page=${orders.getTotalPages-1})}" th:text="${orders.getTotalPages}"></a></li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

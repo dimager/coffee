@@ -1,4 +1,28 @@
 .header1 {
-    background: url("/img/header.jpg") no-repeat center center fixed;
+    background: url("/img/header.jpg") no-repeat;
     height: 200px;
+}
+.hiddenRow {
+    padding: 0 !important;
+}
+
+#map {
+    width: 400px;
+    height: 400px;
+}
+#signup{
+    width: 400px;
+    height: auto;
+}
+#signup form{
+    height: auto;
+}
+
+.img-size-200 {
+    width: auto;
+    height: 200px;
+}
+
+.editfrom {
+    width: 500px;
 }

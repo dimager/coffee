@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html  lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -9,7 +9,7 @@
 <section class="py-5" th:fragment="main">
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            <div th:each="product : ${products}" class="col mb-5">
+            <div th:each="product : ${products}" th:if="${not product.deleted}" class="col mb-5">
                 <div class="card h-100">
                     <!-- Product image-->
                     <img class="card-img-top" th:src="@{'data:image/jpeg;base64,'+${product.imageBase64}}" />
@@ -28,14 +28,20 @@
                     </div>
                     <!-- Product actions-->
                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                        <form class="d-flex me-2" th:object="${addProductToCart}" th:action="@{/addtocart}" method="post">
-                            <input type="hidden" name="id" id="id" th:value="${product.id}"/>
-                            <div class="text-center">
+                        <form class="d-flex me-2" th:object="${productToCart}" th:action="@{/additem}" method="post">
+                            <input type="hidden" name="id" id="id"  th:value="${product.id}"/>
+                            <div th:if="${product.available}" class="text-center">
                                 <button class="btn btn-outline-dark" type="submit">
-                                    Add to cart
+                                    Add to cartItem
                                 </button>
                             </div>
+                            <div th:if="${!product.available}" class="text-center">
+                                unavailable
+                            </div>
                         </form>
+                        <a sec:authorize="hasRole('ROLE_ADMIN')" class="btn btn-outline-dark" th:href="@{'/edit-product/'+${product.id}}">
+                            Edit
+                        </a>
                     </div>
                 </div>
             </div>

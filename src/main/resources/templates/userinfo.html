@@ -1,73 +1,74 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:sec="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html  xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
 
-    <title>userinfo</title>
+    <title>User info</title>
 </head>
-<body>
-<div sec:authorize="hasRole('ROLE_ADMIN')">
-    Hello admin.
+<body class="d-flex flex-column min-vh-100">
+<div th:replace="fragments/navbar :: navbar"></div>
+<div th:if="${loginError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    Wrong user or password!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
-<div sec:authorize="hasRole('ROLE_USER')">
-    Hello user.
-</div>
+<div th:replace="fragments/header :: header"></div>
 
-<div sec:authorize="!isAuthenticated()">
-    <a href="/login">login</a>
-</div>
-<div sec:authorize="isAuthenticated()">
-    <a href="/userinfo">userinfo</a>
-    <a href="/logout">logout</a>
-</div>
-
-
+<div class="p-2">
 <table class="table table-sm">
     <thead>
     <tr>
-        <th scope="col">#</th>
-        <th scope="col">First</th>
-        <th scope="col">Handle</th>
-        <th scope="col">Handle</th>
+        <th scope="col">Id</th>
+        <th scope="col">Date</th>
+        <th scope="col">Status</th>
+        <th scope="col">Location</th>
+        <th scope="col">Products</th>
+        <th scope="col">Discount</th>
+        <th scope="col">Cost</th>
     </tr>
     </thead>
     <tbody th:each="order : ${userorders}">
     <tr>
-        <td th:text="${order.id}">Onions</td>
-        <td th:text="${order.user.username}">Onions</td>
-        <td th:text="${order.orderDateTime}">Onions</td>
-        <td th:text="${order.cost}">Onions</td>
-
+        <td th:text="${order.id}"></td>
+        <td th:text="${#dates.format(order.orderDateTime, 'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${order.orderStatus}"></td>
+        <td th:text="${order.location.name}"></td>
+        <td>
+            <div th:each="o : ${order.orderDetails}">
+                <span th:text="|${o.productName} (${o.productCount})|"></span>
+            </div>
+        </td>
+        <td th:text="${order.discount}"></td>
+        <td th:text="${order.cost*(100-order.discount)/100}"></td>
     </tr>
     </tbody>
 </table>
+</div>
 
-<div th:if="${userorders.getTotalPages > 1}">
+<div th:if="${userorders.getTotalPages > 1}" class="d-flex flex-row justify-content-center">
     <nav aria-label="Page navigation example">
         <ul class="pagination">
             <li th:if="${currentPage>0}" class="page-item">
-                <a class="page-link" th:href="@{/userinfo(page=${currentPage-1})}">Previous</a></li>
-            <li th:if="${currentPage!=0}" class="page-item">
-                <a class="page-link" th:href="@{/userinfo(page=0)}">First</a></li>
+                <a class="page-link" th:href="@{/userinfo(page=0)}">1</a></li>
+            <li th:if="${currentPage>1}" class="page-item">
+            <a class="page-link" th:href="@{/userinfo(page=${currentPage-1})}">Previous</a></li>
             <li class="page-item">
                 <a class="page-link" th:href="@{/userinfo(page=${currentPage})}" th:text="${currentPage+1}"></a></li>
+            <li th:if="${currentPage<userorders.getTotalPages-1}" class="page-item">
+                <a class="page-link" th:href="@{/userinfo(page=${currentPage+1})}">Next</a></li>
             <li th:if="${currentPage!=userorders.getTotalPages-1}" class="page-item">
                 <a class="page-link" th:href="@{/userinfo(page=${userorders.getTotalPages-1})}">Last(<span
                         th:text="${userorders.getTotalPages-1}"></span>)</a></li>
-            <li th:if="${currentPage<userorders.getTotalPages-1}" class="page-item">
-                <a class="page-link" th:href="@{/userinfo(page=${currentPage+1})}">Next</a></li>
+
         </ul>
     </nav>
 </div>
 
-
-Logged user: <span sec:authentication="name">Bob</span>
-Roles: <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>
+<div th:replace="fragments/footer :: footer"></div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
         crossorigin="anonymous"></script>
-
 </body>
 </html>

@@ -1,78 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
-<body>
-<div th:fragment="cart" class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight"
-     aria-labelledby="offcanvasRightLabel">
-    <div class="offcanvas-header">
-        <h5 id="offcanvasRightLabel">Cart</h5>
-        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div th:each="item : ${cart}" class="offcanvas-body">
-        <span th:text="${item.key.name}"></span>
-        <span th:text="${item.key.cost}"></span>
-        <span th:text="${item.value}"></span>
-        <form class="d-flex me-2" th:object="${deleteProductFromCart}" th:action="@{/deletefromcart}" method="post">
-            <input type="hidden" name="id" id="id" th:value="${item.key.id}"/>
-            <div class="text-center">
-                <button class="btn btn-outline-dark" type="submit">
-                    Add to cart
-                </button>
+<body class="d-flex flex-column min-vh-100">
+
+<div class="flex-grow-1" th:fragment="bodycart">
+    <div class="d-flex flex-column py-3 px-3 flex-nowrap">
+        <div>
+            <table class="table table-hover table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Cost</th>
+                    <th scope="col">Count</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">+-</th>
+                </tr>
+                </thead>
+                <tbody th:each="item : ${cart}">
+                <tr>
+                    <td th:text="${item.key.name}"></td>
+                    <td th:text="${item.key.cost}"></td>
+                    <td th:text="${item.value}"></td>
+                    <td th:text="${item.key.cost*item.value}"></td>
+                    <td class="d-flex flex-row">
+                        <form class="d-flex me-2" th:object="${productToCart}" th:action="@{/addtocart}"
+                              method="post">
+                            <input type="hidden" name="id" th:value="${item.key.id}"/>
+                            <button type="submit" class="btn btn-light"><span class="oi oi-plus"></span></button>
+                        </form>
+                        <form class="d-flex me-2" th:object="${deleteProductFromCart}" th:action="@{/deletefromcart}"
+                              method="post">
+                            <input type="hidden" name="id" th:value="${item.key.id}"/>
+                            <button type="submit" class="btn btn-light"><span class="oi oi-minus"></span></i></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="align-self-end d-inline-flex me-2 flex-column ">
+                <span>Total cost:</span>
+                <span sec:authorize="!isAuthenticated()" th:text="${totalPrice}"></span>
+                <del sec:authorize="isAuthenticated()"  th:text="${totalPrice}"></del>
+                <span sec:authorize="isAuthenticated()"   th:class="text-danger"
+                      th:text="|${totalPrice*(100-userdata.discount)/100}  (discount: ${userdata.discount}%)|"></span>
+                <div>
+                    <form class="d-inline-flex me-2 flex-column" th:object="${orderInfo}" th:action="@{/cart}" method="post">
+                        <span class="my-2">Location</span>
+                        <select class="my-2" th:field="*{locationId}" id="locationId">
+                            <option th:selected="${location.id==1}" th:each="location : ${locations}"
+                                    th:value="${location.id}"
+                                    th:text="${location.name}"></option>
+                        </select>
+                        <input sec:authorize="!isAuthenticated()" th:field="*{name}" placeholder="name"/>
+                        <input sec:authorize="!isAuthenticated()" th:field="*{phone}" placeholder="phone"/>
+                        <input sec:authorize="isAuthenticated()" type="text" th:value="${userdata.name}" th:id="name" th:name="name"   placeholder="name"/>
+                        <input sec:authorize="isAuthenticated()" type="text" th:value="${userdata.phone}" th:id="phone" th:name="phone"  placeholder="phone"/>
+                        <button type="submit" class="btn my-2 btn-outline-dark">Order</button>
+                    </form>
+                </div>
             </div>
-        </form>
-    </div>
-</div>
-<div th:fragment="bodycart">
-    <div class="px-5 py-2">
-        <table class="table table-hover table-sm" >
-            <thead>
-            <tr>
-                <th scope="col">Product</th>
-                <th scope="col">Cost</th>
-                <th scope="col">Count</th>
-                <th scope="col">Total</th>
-                <th scope="col">Total</th>
-            </tr>
-            </thead>
-            <tbody th:each="item : ${cart}">
-            <tr>
-                <td th:text="${item.key.name}"></td>
-                <td th:text="${item.key.cost}"></td>
-                <td th:text="${item.value}"></td>
-                <td th:text="${item.key.cost*item.value}"></td>
-                <td>
-                    <form class="d-flex me-2" th:object="${deleteProductFromCart}" th:action="@{/deletefromcart}" method="post">
-                        <input type="hidden" name="id" th:value="${item.key.id}"/>
-                        <button type="submit"><i class="fa-solid fa-minus"></i></i></button>
-                    </form>
-                    <form class="d-flex me-2" th:object="${addProductToCart}" th:action="@{/additem}" method="post">
-                        <input type="hidden" name="id" th:value="${item.key.id}"/>
-                        <button type="submit"><i class="fa-solid fa-plus"></i></button>
-                    </form>
-                </td>
-            </tr>
-            <tfoot>
-            <span th:text="${totalPrice}"></span>
-            </tfoot>
-            </tbody>
+        </div>
 
-        </table>
-        <form class="d-flex me-2" th:action="@{/doorder}" >
-            <button type="submit">Order</button>
-        </form>
-
-        <!--  <form class="d-flex me-2" th:object="${deleteProductFromCart}" th:action="@{/deletefromcart}" method="post">
-              <input type="hidden" name="id" th:value="${item.key.id}"/>
-              <div class="text-center">
-                  <button class="btn btn-outline-dark" type="submit">
-                      Add to cart
-                  </button>
-              </div>
-          </form>-->
     </div>
+
 </div>
 
 </body>

@@ -26,17 +26,19 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .antMatchers("/static/**").permitAll()
-                .antMatchers("/admin").hasRole(Roles.ADMIN.name())
-                .antMatchers("/userinfo").hasAnyRole(Roles.ADMIN.name(), Roles.USER.name())
-                .antMatchers("/order").hasAnyRole(Roles.ADMIN.name(), Roles.USER.name())
+                .antMatchers("/static/**", "/","/signup","errors/**","/change-locale").permitAll()
+                .antMatchers("/userinfo").hasRole(Roles.USER.name())
+                .antMatchers("/admin", "/orders", "/order-details", "/change-discount", "/change-status","/products","/edit-product/**","/delete-product/**","/add-product").hasRole(Roles.ADMIN.name())
                 .and()
                 .formLogin()
-                .loginPage("/login.html")
+                .loginPage("/")
                 .failureUrl("/login-error")
                 .and()
                 .logout()
-                .logoutSuccessUrl("/");
+                .logoutSuccessUrl("/")
+                .and()
+                .exceptionHandling().accessDeniedPage("/error-page")
+                .and().csrf().disable();
         return http.build();
     }
 

@@ -1,131 +1,104 @@
 package com.mager.coffeeshop.service.impl;
 
-import com.mager.coffeeshop.entity.*;
+import com.mager.coffeeshop.entity.CartItem;
+import com.mager.coffeeshop.entity.Product;
 import com.mager.coffeeshop.repository.CartRepository;
 import com.mager.coffeeshop.service.CartService;
-import com.mager.coffeeshop.service.OrderService;
 import com.mager.coffeeshop.service.ProductService;
 import com.mager.coffeeshop.service.UserService;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
-import java.math.BigDecimal;
-import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
-    @Autowired
-    private CartRepository cartRepository;
 
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private ProductService productService;
+    private final CartRepository cartRepository;
 
-    @Autowired
-    private UserService userService;
+    private final ProductService productService;
+
+    private final UserService userService;
+
+    public CartServiceImpl(CartRepository cartRepository, ProductService productService, UserService userService) {
+        this.cartRepository = cartRepository;
+        this.productService = productService;
+        this.userService = userService;
+    }
+
 
     @Override
-    public HashMap<Product, Integer> getCart(HttpSession httpSession, Principal principal, Authentication authentication) {
-        Cart cart;
-        if (authentication != null && authentication.isAuthenticated()) {
-            cart = new Cart(userService.getUserData(principal));
-        } else {
-            cart = new Cart(httpSession.getId());
-        }
-        return getProductCartItems(cart);
+    public void cleanUserCart() {
+        String customerUUID = userService.getCustomerUUID();
+        cartRepository.deleteAll(this.getUserCart(customerUUID));
     }
 
     @Override
-    public void addToCart(Product product, Authentication authentication, Principal principal, HttpSession httpSession) {
+    public Map<Product, Integer> getUserProductCart() {
+        String customerUUID = userService.getCustomerUUID();
+        Map<Product, Integer> collect = getUserCart(customerUUID)
+                .stream()
+                .collect(Collectors.toMap(
+                        cartItem -> productService.getById(new ObjectId(cartItem.getProductId())),
+                        CartItem::getProductCount
+                ));
+        return collect;
+    }
 
-        Optional<Cart> cartItem;
-        Cart cart;
-        User user = null;
+    @Override
+    public List<CartItem> getUserCart(String UUID) {
+        CartItem cartItem = new CartItem(UUID);
+        List<CartItem> userCartItems = cartRepository.findAll(Example.of(cartItem));
+        return userCartItems;
+    }
 
-        if (authentication != null && authentication.isAuthenticated()) {
-            user = userService.getUserData(principal);
-            cart = new Cart(user);
-        } else {
-            cart = new Cart(httpSession.getId());
+    @Override
+    public void addToCart(Product product) {
+        if (productService.existById(product.getId())) {
+            Product productById = productService.getById(product.getId());
+            if (productById.isAvailable() && !productById.isDeleted()) {
+                Example<CartItem> cartItemExample = getCartItemExampleWithProduct(product);
+                Optional<CartItem> cartItem = cartRepository.findOne(cartItemExample);
+                this.addItemToUserCart(product, cartItem);
+            }
         }
+    }
 
-        cart.setProductId(product.getId().toString());
-        Example<Cart> cartExample = Example.of(cart);
-        cartItem = cartRepository.findOne(cartExample);
+    private Example<CartItem> getCartItemExampleWithProduct(Product product) {
+        CartItem item = new CartItem(userService.getCustomerUUID());
+        item.setProductId(product.getId().toString());
+        return Example.of(item);
 
+    }
+
+    private void addItemToUserCart(Product product, Optional<CartItem> cartItem) {
         if (cartItem.isPresent()) {
             Integer productCount = cartItem.get().getProductCount();
             cartItem.get().setProductCount(++productCount);
             cartRepository.save(cartItem.get());
         } else {
-            Cart newCartItem = new Cart();
-            if (authentication != null && authentication.isAuthenticated()) {
-                newCartItem.setUser(user);
-            } else {
-                newCartItem.setSessionId(httpSession.getId());
-            }
-            newCartItem.setProductId(product.getId().toString());
-            newCartItem.setProductCount(1);
+            CartItem newCartItem = new CartItem(userService.getCustomerUUID(), product.getId().toString(), 1);
             cartRepository.save(newCartItem);
         }
     }
 
     @Override
-    public void deleteFromCart(Product product, Authentication authentication, Principal principal, HttpSession httpSession) {
-        Optional<Cart> cartItem;
-        Cart cart;
-        if (authentication != null && authentication.isAuthenticated()) {
-            cart = new Cart(userService.getUserData(principal));
-        } else {
-            cart = new Cart(httpSession.getId());
-        }
-
-        cart.setProductId(product.getId().toString());
-        Example<Cart> cartExample = Example.of(cart);
-        cartItem = cartRepository.findOne(cartExample);
-        if (cartItem.isPresent()) {
-            Integer productCount = cartItem.get().getProductCount();
-            if (productCount > 1) {
-                cartItem.get().setProductCount(--productCount);
-                cartRepository.save(cartItem.get());
-            } else {
-                cartRepository.delete(cartItem.get());
+    public void deleteFromCart(Product product) {
+        List<CartItem> userCartItem = getUserCart(userService.getCustomerUUID());
+        for (CartItem cartItem : userCartItem) {
+            if (cartItem.getProductId().equals(product.getId().toString())) {
+                Integer productCount = cartItem.getProductCount();
+                if (productCount > 1) {
+                    cartItem.setProductCount(--productCount);
+                    cartRepository.save(cartItem);
+                } else {
+                    cartRepository.delete(cartItem);
+                }
             }
         }
-    }
-
-    private HashMap<Product, Integer> getProductCartItems(Cart cart) {
-        List<Cart> all = cartRepository.findAll(Example.of(cart));
-        HashMap<Product, Integer> cartItems = new HashMap<>();
-        all.stream().forEach(cart1 -> cartItems.put(productService.getById(new ObjectId(cart1.getProductId())), cart1.getProductCount()));
-        return cartItems;
-    }
-
-    @Override
-    public void doOrder(HttpSession httpSession, Principal principal, Authentication authentication) {
-        HashMap<Product, Integer> cart = getCart(httpSession, principal, authentication);
-        Order order = new Order();
-        cart.forEach((product, integer) -> order.getOrderDetails().add(new OrderDetail(product.getId().toString(), integer, product.getCost())));
-        order.getOrderDetails().forEach(orderDetail -> orderDetail.setOrder(order));
-        if (authentication != null && authentication.isAuthenticated()) {
-            User user = userService.getUserData(principal);
-            order.setUser(user);
-            BigDecimal decimal = order.getOrderDetails().stream()
-                    .map(orderDetail -> orderDetail.getProductCost().multiply(BigDecimal.valueOf(orderDetail.getProductCount())))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            order.setCost(decimal);
-        }
-        System.out.println(order.getUser());
-        System.out.println(order.getOrderDetails());
-        orderService.doOrder(order);
     }
 }

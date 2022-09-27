@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../../static/css/main.css"/>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="allproducts">
+    <a th:href="@{/add-product}" class="btn btn-outline-dark me-2 my-1" type="submit">
+        Add
+    </a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">id</th>
+            <th scope="col">name</th>
+            <th scope="col">desc</th>
+            <th scope="col">cost</th>
+            <th scope="col">available</th>
+            <th scope="col">deleted</th>
+            <th scope="col">image</th>
+            <th scope="col">action</th>
+        </tr>
+        </thead>
+        <tbody th:each="p : ${products}">
+        <tr>
+            <th scope="row">1</th>
+            <td th:text="${p.id}">Mark</td>
+            <td th:text="${p.name}">Mark</td>
+            <td th:text="${p.description}">Mark</td>
+            <td th:text="${p.cost}">Mark</td>
+            <td th:text="${p.isAvailable}">Mark</td>
+            <td th:text="${p.isDeleted}">Mark</td>
+            <td><img class="card-img-top img-thumbnail img-size-200"
+                     th:src="@{'data:image/jpeg;base64,'+${p.imageBase64}}"/></td>
+            <td>
+                <a th:href="|/edit-product/${p.id}|" class="btn btn-outline-dark me-2 my-1" th:text="edit"></a>
+                <form th:action="|/delete-product/${p.id}|"  th:method="post">
+                    <button type="submit" class="btn btn-outline-dark me-2 my-1" th:text="delete"></button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:fragment="editproduct">
+    <div th:if="${productNotFound} or ${productIdIncorrect}" class="alert alert-danger alert-dismissible fade show"
+         role="alert">
+        <span th:if="${productNotFound}" th:text="#{product.notfound}"></span>
+        <span th:if="${productIdIncorrect}" th:text="#{product.idincorrect}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="d-flex  flex-wrap justify-content-center m-4">
+        <div th:if="!(${productNotFound} or ${productIdIncorrect})">
+            <form th:action="@{/edit-product}" th:object="${product}" method="post" enctype="multipart/form-data"
+                  class="d-flex flex-row-reverse flex-nowrap">
+                <input id="id" type="text" hidden th:field="*{id}" th:value="${product.id}">
+                <div class="d-flex flex-column flex-nowrap">
+                    <img class="card-img-top  img-thumbnail"
+                         th:src="@{'data:image/jpeg;base64,'+${product.imageBase64}}"/>
+                    <div class="d-flex flex-row flex-nowrap">
+                        <input id="image" type="file" name="image">
+                    </div>
+                </div>
+                <div class="d-flex flex-column me-3">
+                    <div class="d-flex flex-nowrap flex-column">
+                        <label for="name" th:text="#{product.name}"></label>
+                        <input id="name" type="text" th:field="*{name}" th:value="${product.name}">
+                    </div>
+                    <div class="d-flex flex-nowrap flex-column">
+                        <label for="description" th:text="#{product.description}"></label>
+                        <input id="description" type="text" th:field="*{description}" th:value="${product.description}">
+                    </div>
+                    <div class="d-flex flex-nowrap flex-column">
+                        <label for="cost" th:text="#{product.cost}"></label>
+                        <input id="cost" th:field="*{cost}" th:value="${product.cost}">
+                    </div>
+                    <div class="d-flex flex-nowrap flex-column">
+                        <input type="checkbox" th:field="*{available}" th:checked="${product.available}"
+                               th:text="available"/>
+                    </div>
+                    <div class="d-flex flex-nowrap flex-column">
+                        <input type="checkbox" th:field="*{deleted}" th:checked="${product.deleted}"
+                               th:text="deleted"/>
+                    </div>
+                    <button type="submit" class="btn btn-outline-dark " th:text="save"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="addproduct">
+    <form th:action="@{/add-product}" th:object="${product}" method="post" enctype="multipart/form-data">
+        <input id="name" type="text" th:field="*{name}" placeholder="name">
+        <input id="image" type="file" name="image">
+        <input id="description" type="text" th:field="*{description}" placeholder="desc">
+        <input id="cost" th:field="*{cost}" placeholder="cost">
+        <button type="submit" th:text="save"></button>
+    </form>
+</div>
+
+</body>
+</html>

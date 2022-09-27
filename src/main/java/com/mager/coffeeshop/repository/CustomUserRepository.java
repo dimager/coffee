@@ -1,4 +1,4 @@
-package com.mager.coffeeshop.repository.custom;
+package com.mager.coffeeshop.repository;
 
 import com.mager.coffeeshop.entity.User;
 

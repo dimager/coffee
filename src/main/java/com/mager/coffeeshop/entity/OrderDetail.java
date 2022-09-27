@@ -24,8 +24,9 @@ public class OrderDetail {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    public OrderDetail(String productId, Integer productCount, BigDecimal productCost) {
+    public OrderDetail(String productId, Integer productCount, BigDecimal productCost, String productName) {
         this.productId = productId;
+        this.productName = productName;
         this.productCount = productCount;
         this.productCost = productCost;
     }
@@ -36,6 +37,9 @@ public class OrderDetail {
 
     @Column(name = "product_id", nullable = false)
     private String productId;
+
+    @Column(name = "product_name")
+    private String productName;
 
     @Column(name = "product_count", nullable = false)
     private Integer productCount;

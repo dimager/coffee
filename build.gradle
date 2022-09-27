@@ -2,35 +2,58 @@ plugins {
     id 'org.springframework.boot' version '2.7.1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
-}
 
-group = 'com.mager'
-version = '0.0.1-SNAPSHOT'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
 }
+group 'com.mager'
+version '0.0.1-SNAPSHOT'
+
 
 repositories {
     mavenCentral()
 }
-
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    runtimeOnly 'mysql:mysql-connector-java'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    implementation 'org.springframework.session:spring-session-data-mongodb'
-    implementation 'org.webjars:bootstrap:5.1.3'
+    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-security')
+    implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-log4j2')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('com.h2database:h2:2.1.214')
+    runtimeOnly('mysql:mysql-connector-java')
+    implementation('org.thymeleaf.extras:thymeleaf-extras-springsecurity5')
+    compileOnly('org.projectlombok:lombok')
+    annotationProcessor('org.projectlombok:lombok')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+    testImplementation('org.springframework.security:spring-security-test')
+    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.0.2-beta')
+    implementation('org.springframework.session:spring-session-data-mongodb')
+    runtimeOnly('org.webjars:bootstrap:5.2.0')
+    implementation("ch.itds.taglib:phonenumber-thymeleaf-taglib:1.0.1")
+
+}
+configurations {
+    all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    all*.exclude group: 'com.fasterxml.jackson.core', module: '*'
+    all*.exclude group: 'com.fasterxml.jackson.datatype', module: '*'
+    all*.exclude group: 'com.fasterxml.jackson.module', module: '*'
+    all*.exclude group: 'com.jayway.jsonpath', module: '*'
+    all*.exclude group: 'com.vaadin.external.google', module: '*'
+    all*.exclude group: 'com.sun.activation', module: '*'
+    all*.exclude group: 'org.apache.commons', module: '*'
+    all*.exclude group: 'ognl', module: '*'
+    all*.exclude group: 'org.apiguardian', module: '*'
+    all*.exclude group: 'net.java.dev.jna', module: '*'
+    all*.exclude group: 'org.attoparser.dev.jna', module: '*'
+    all*.exclude group: 'org.attoparser.dev', module: '*'
+    all*.exclude group: 'org.hamcrest', module: '*'
+    all*.exclude group: 'net.bytebuddy', module: 'byte-buddy-agent'
+    all*.exclude group: 'org.jgrapht', module: '*'
+    all*.exclude group: 'org.yaml', module: '*'
+    all*.exclude group: 'org.webjars', module: '*'
+    all*.exclude group: 'org.skyscreamer', module: '*'
 
 
 }

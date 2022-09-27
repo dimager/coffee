@@ -2,6 +2,7 @@ package com.mager.coffeeshop.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
@@ -20,7 +21,8 @@ public class Product {
     private String name;
     private String description;
     private BigDecimal cost;
-//    private Binary image;
+    private boolean available = false;
+    private boolean deleted = false;
     private String imageBase64;
 
 }
