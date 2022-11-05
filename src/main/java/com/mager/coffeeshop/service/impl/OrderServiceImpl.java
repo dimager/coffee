@@ -72,7 +72,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<Order> getUserOrders(Principal principal, int page) {
         Order order = new Order();
-        User user = userService.getUserByPrincipal(principal);
+//        User user = userService.getUserByPrincipal(principal);
+        User user = userService.getUserFromSecurityContext();
         order.setUser(user);
         Example<Order> example = Example.of(order,
                 ExampleMatcher

@@ -17,7 +17,7 @@ public class CustomUserRepositoryImpl implements CustomUserRepository {
 
     @Override
     public User findByUsername(String name) {
-
+        System.out.println("name = " + name);
         TypedQuery<User> query = entityManager.createQuery(FIND_USER_BY_USERNAME, User.class);
         query.setParameter("username", name);
         return query.getSingleResult();

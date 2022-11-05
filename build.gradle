@@ -32,13 +32,10 @@ dependencies {
     implementation('org.springframework.session:spring-session-data-mongodb')
     runtimeOnly('org.webjars:bootstrap:5.2.0')
     implementation("ch.itds.taglib:phonenumber-thymeleaf-taglib:1.0.1")
-
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.5'
 }
 configurations {
     all*.exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-    all*.exclude group: 'com.fasterxml.jackson.core', module: '*'
-    all*.exclude group: 'com.fasterxml.jackson.datatype', module: '*'
-    all*.exclude group: 'com.fasterxml.jackson.module', module: '*'
     all*.exclude group: 'com.jayway.jsonpath', module: '*'
     all*.exclude group: 'com.vaadin.external.google', module: '*'
     all*.exclude group: 'com.sun.activation', module: '*'

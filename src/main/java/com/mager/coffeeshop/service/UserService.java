@@ -9,6 +9,8 @@ public interface UserService {
 
     User getUserByPrincipal(Principal principal);
 
+    User getUserFromSecurityContext();
+
     User getUserByUsername(String username);
 
     User getUserByUUID(String UUID);

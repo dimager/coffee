@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,6 +32,8 @@ public class SpringSecurityConfig {
                 .antMatchers("/userinfo").hasRole(Roles.USER.name())
                 .antMatchers("/admin", "/orders", "/order-details", "/change-discount", "/change-status","/products","/edit-product/**","/delete-product/**","/add-product").hasRole(Roles.ADMIN.name())
                 .and()
+                .oauth2Login()
+                .and()
                 .formLogin()
                 .loginPage("/")
                 .failureUrl("/login-error")
@@ -38,7 +42,7 @@ public class SpringSecurityConfig {
                 .logoutSuccessUrl("/")
                 .and()
                 .exceptionHandling().accessDeniedPage("/error-page")
-                .and().csrf().disable();
+                .and().csrf();
         return http.build();
     }
 

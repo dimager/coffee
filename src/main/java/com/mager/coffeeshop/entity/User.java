@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Column;
@@ -22,6 +23,7 @@ import javax.validation.constraints.Max;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
 })
 @Getter
 @Setter
-public class User implements UserDetails {
+public class User implements UserDetails, OAuth2User {
     @Id
 
     @Column(name = "uuid", unique = true, nullable = false)
@@ -86,6 +88,16 @@ public class User implements UserDetails {
         this.username = username;
     }
 
+
+    @Override
+    public <A> A getAttribute(String name) {
+        return OAuth2User.super.getAttribute(name);
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
