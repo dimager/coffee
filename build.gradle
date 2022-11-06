@@ -35,6 +35,8 @@ dependencies {
     testImplementation('org.springframework.security:spring-security-test')
     testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.0.2-beta')
     implementation('org.springframework.session:spring-session-data-mongodb')
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     runtimeOnly('org.webjars:bootstrap:5.2.0')
     implementation("ch.itds.taglib:phonenumber-thymeleaf-taglib:1.0.1")
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.5'
