@@ -22,12 +22,10 @@ import java.util.Objects;
 public class MainController {
 
     private final SessionLocaleResolver localeResolver;
-    private final UserService userService;
     private final ProductService productService;
 
-    public MainController(SessionLocaleResolver localeResolver, UserService userService, ProductService productService) {
+    public MainController(SessionLocaleResolver localeResolver, ProductService productService) {
         this.localeResolver = localeResolver;
-        this.userService = userService;
         this.productService = productService;
     }
 
@@ -60,6 +58,7 @@ public class MainController {
 
     @PostMapping("/change-locale")
     public RedirectView changeLocale(HttpServletRequest request, HttpServletResponse response, String locale) {
+        System.out.println("locale = " + locale);
         localeResolver.setLocale(request, response, new Locale(locale));
         return new RedirectView("/");
     }
